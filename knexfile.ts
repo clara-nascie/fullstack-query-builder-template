@@ -1,7 +1,7 @@
 export default {
     client: 'sqlite3',
     connection: {
-        filename: './src/database/databse.db',
+        filename: './src/database/database.db',
     },
     //ignora valores undefinied e transforma em null
     useNullAsDefault: true,
