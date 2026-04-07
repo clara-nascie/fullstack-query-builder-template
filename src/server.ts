@@ -1,10 +1,33 @@
 import express, { Request, Response } from "express"
+import { knex } from "./database/knex"
 
 const app = express()
 app.use(express.json())
 
-app.get("/", async (request: Request, response: Response) => {
-  response.json({ message: "Hello World!" })
+// Rota para testar se o servidor está rodando
+app.post("/courses", async (request: Request, response: Response) => {
+  const { name } = request.body
+
+  await knex('courses').insert({ name })
+ // await knex.raw("INSERT INTO courses (name) VALUES (?)", [name])
+
+  return response.status(201).json(name)
+})
+
+// Listar cursos com select * from courses 
+app.get("/courses", async (request: Request, response: Response) => {
+  const courses = await knex('courses').select('*').orderBy("name")
+  return response.status(200).json(courses)
+})
+
+// Atualizar curso com update courses set name = ? where id = ?
+app.put("/courses/:id", async (request: Request, response: Response) => {
+  const { name } = request.body
+
+  // o id vem da url e o name vem do body, então usamos request.params.id para pegar o id e request.body.name para pegar o nome
+  await knex('courses').update({ name }).where({ id: request.params.id })
+  
+  return response.status(200).json(name)
 })
 
 app.listen(3333, () => console.log(`Server is running on port 3333`))
