@@ -48,11 +48,27 @@ app.post("/modules", async (request: Request, response: Response) => {
   return response.status(201).json()
 })
 
+//listar todos os modulos de todos os cursos
 app.get("/modules", async (request: Request, response: Response) => {
   //select * from course_modules join courses on courses.id = course_modules.course_id
   const modules = await knex('course_modules').select('*')
   return response.status(200).json(modules)
 })
 
+//listar modulos de um curso específico
+app.get("/courses/:id/modules", async (request: Request, response: Response) => {
+  //select * from courses join course_modules on courses.id = course_modules.course_id where courses.id = ?
+  const courses = await knex('courses')
+  .select(
+    //renomeando as colunas para não haver conflito de nomes
+    // entre as tabelas e facilitar a identificação no front-end
+    'courses.id AS course_id',
+    'course_modules.id AS module_id', 
+    'course_modules.name AS module', 
+    'courses.name AS course')
+  .join('course_modules', "courses.id", "course_modules.course_id")
+  .where('courses.id', request.params.id)
+  return response.status(200).json(courses)
+})
 
 app.listen(3333, () => console.log(`Server is running on port 3333`))
